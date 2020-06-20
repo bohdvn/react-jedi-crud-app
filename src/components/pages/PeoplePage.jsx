@@ -1,45 +1,43 @@
 import React, {useEffect, useState} from 'react';
+import {useHistory} from 'react-router-dom'
 import Table from "../common/Table";
-import Form from "../common/Form";
-import  {getPeople} from "../../services/swApiService";
+import {getPeople} from "../../services/swApiService";
+import Button from "../common/Button";
 
-const data = [
-    {first: 'Mark', last: 'Otto', handle: '@motto', id: '1'},
-    {first: 'Carl', last: 'Reno', handle: '@ceno', id: '2'},
-    {first: 'Steve', last: 'Smith', handle: '@ssteve', id: '3'}
-]
-
-const columns = Object.keys(data[0]);
 
 const PeoplePage = () => {
     const pageName = 'People';
     const [people, setPeople] = useState([]);
+    const history = useHistory();
 
-    useEffect( () => {
-        const getData = async () => {
-            const data = await getPeople()
-            console.log(data)
-            setPeople(data)
+    useEffect(() => {
+        // localStorage.removeItem('people')
+        if (localStorage.getItem('people')!==null) {
+            setPeople(JSON.parse(localStorage.getItem('people')))
+        } else {
+            const getData = async () => {
+                const data = await getPeople()
+                localStorage.setItem('people', JSON.stringify(data));
+                console.log(data)
+                setPeople(data)
+            }
+
+            getData()
         }
-
-        getData()
     }, [])
-
-    const handleAppPerson = (personData) => {
-        const data = [...people, personData];
-        setPeople(data)
-    }
 
     const handleDelete = (id) => {
         const filteredPeople = people.filter(person => person.id !== id);
         setPeople(filteredPeople)
     }
 
-    const getInitialPeopleData = () => {
-        return columns.reduce((cols, columnName) => {
-            cols[columnName] = "";
-            return cols;
-        }, {})
+    const handleEdit = (id) => {
+        history.push("/person?id="+id);
+        console.log(id)
+    }
+
+    const handleClick = () => {
+        history.push("/person");
     }
 
     const getColumnNames = () => {
@@ -58,11 +56,12 @@ const PeoplePage = () => {
                 columns={getColumnNames()}
                 tableDescriptor={pageName}
                 onDelete={handleDelete}
+                onEdit={handleEdit}
             />
-            <Form
-                initialData={getInitialPeopleData()}
-                columns={getColumnNames()}
-                onAddData={handleAppPerson}
+            <Button
+                label="Create Person"
+                classes="alert alert-primary"
+                onClick={handleClick}
             />
         </>
     );

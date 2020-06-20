@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from "./Button";
 
-function Table({columns, data, tableDescriptor, onDelete}) {
+function Table({columns, data, tableDescriptor, onDelete, onEdit}) {
 
     if (!data.length) {
         return <h2>There is no data for {tableDescriptor} page</h2>
@@ -24,6 +24,13 @@ function Table({columns, data, tableDescriptor, onDelete}) {
                     {columns.map(columnTitle => (
                         <td key={item[columnTitle] + columnTitle}>{item[columnTitle]}</td>
                     ))}
+                    <td>
+                        <Button
+                            onClick={() => onEdit(item.id)}
+                            classes="btn btn-primary"
+                            label="Edit"
+                        />
+                    </td>
                     <td>
                         <Button
                             onClick={() => onDelete(item.id)}
